@@ -1,0 +1,598 @@
+@startuml
+set namespaceSeparator ::
+
+class "js_flutter::dataTypes::bgReading.dart::BgReading" {
+  +double mmol
+  +String trend
+  +DateTime time
+}
+
+class "js_flutter::dataTypes::DbUser.dart::DbUser" {
+  +String name
+  +int level
+  +int points
+  +List<String> friends
+}
+
+abstract class "js_flutter::entity::BaseEntity.dart::BaseEntity" {
+  +Map<String, dynamic> toFirestore()
+}
+
+class "js_flutter::entity::BgReadingEntity.dart::BgReadingEntity" {
+  +String? trend
+  +DateTime? time
+  +double? mmol
+  +Map<String, dynamic> toFirestore()
+  +BgReading toBgReading()
+}
+
+"js_flutter::entity::BaseEntity.dart::BaseEntity" <|-- "js_flutter::entity::BgReadingEntity.dart::BgReadingEntity"
+
+class "js_flutter::entity::DailyStatsEntity.dart::DailyStatsEntity" {
+  +int? points
+  +int? highs
+  +int? lows
+  +DateTime? lastReading
+  +Map<String, dynamic> toFirestore()
+}
+
+"js_flutter::entity::BaseEntity.dart::BaseEntity" <|-- "js_flutter::entity::DailyStatsEntity.dart::DailyStatsEntity"
+
+class "js_flutter::entity::UserEntity.dart::UserEntity" {
+  +String? name
+  +int? level
+  +int? points
+  +List<String>? friends
+  +Map<String, dynamic> toFirestore()
+}
+
+"js_flutter::entity::BaseEntity.dart::BaseEntity" <|-- "js_flutter::entity::UserEntity.dart::UserEntity"
+
+class "js_flutter::firebase_options.dart::DefaultFirebaseOptions" {
+  {static} +FirebaseOptions web
+  {static} +FirebaseOptions android
+  {static} +FirebaseOptions ios
+  {static} +FirebaseOptions currentPlatform
+}
+
+"js_flutter::firebase_options.dart::DefaultFirebaseOptions" o-- "firebase_core_platform_interface::firebase_core_platform_interface.dart::FirebaseOptions"
+
+class "js_flutter::main.dart::MyApp" {
+  {static} +FirebaseAnalytics analytics
+  {static} +FirebaseAnalyticsObserver observer
+  +Widget build()
+}
+
+"js_flutter::main.dart::MyApp" o-- "firebase_analytics::firebase_analytics.dart::FirebaseAnalytics"
+"js_flutter::main.dart::MyApp" o-- "firebase_analytics::observer.dart::FirebaseAnalyticsObserver"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "js_flutter::main.dart::MyApp"
+
+class "js_flutter::pages::HomePage.dart::HomePage" {
+  +HomePageController controller
+  +Function startCallback
+  +State<HomePage> createState()
+}
+
+"js_flutter::pages::HomePage.dart::HomePage" o-- "js_flutter::pages::MainPage.dart::HomePageController"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "js_flutter::pages::HomePage.dart::HomePage"
+
+class "js_flutter::pages::HomePage.dart::_HomePageState" {
+  +String? displayName
+  +String? id
+  +String? pwd
+  +int dailyGoal
+  +Timer? timer
+  +Timer? delay
+  +List<bool> intervals
+  +int selectedInterval
+  +DateTime? pausedAt
+  +double streakRowSize
+  +double circularSize
+  +double mainHeight
+  +List<BgReading> datasource
+  +List<BgReading> newDatasource
+  +ApiController apiController
+  +BgReadingRepository bgRepo
+  +PointsRepository pointsRepo
+  +ForegroundService foregroundService
+  +EncryptedSharedPreferences encryptedSharedPreferences
+  -TrackballBehavior? _trackballBehavior
+  -Stream<DocumentSnapshot<DailyStatsEntity>>? _pointsStream
+  -Stream<QuerySnapshot<BgReadingEntity>>? _bgReadingStream
+  +AppLifecycleState? appLifecycleState
+  -GlobalKey<State<StatefulWidget>> _graphKey
+  +List<DailyStatsEntity> dailyStats
+  +Map<int, String> weekDays
+  -List<Widget> _toggleButtons
+  +void didChangeAppLifecycleState()
+  +void initState()
+  +void dispose()
+  +void permissions()
+  +void initStreams()
+  +void cleanUp()
+  +Future<User?> setUser()
+  +Future<void> setPrefs()
+  +Future<void> setUp()
+  +Future<void> setStreak()
+  -SfCartesianChart _buildDefaultDateTimeAxisChart()
+  -List<ScatterSeries<BgReading, DateTime>> _getDefaultDateTimeSeries()
+  -StatefulWidget _buildCircularIndicator()
+  +Row dailyGoalStreak()
+  +Color selectColor()
+  +Widget build()
+}
+
+"js_flutter::pages::HomePage.dart::_HomePageState" o-- "dart::async::Timer"
+"js_flutter::pages::HomePage.dart::_HomePageState" o-- "js_flutter::services::apiController.dart::ApiController"
+"js_flutter::pages::HomePage.dart::_HomePageState" o-- "js_flutter::repository::BgReadingRepository.dart::BgReadingRepository"
+"js_flutter::pages::HomePage.dart::_HomePageState" o-- "js_flutter::repository::PointsRepository.dart::PointsRepository"
+"js_flutter::pages::HomePage.dart::_HomePageState" o-- "js_flutter::services::ForegroundService.dart::ForegroundService"
+"js_flutter::pages::HomePage.dart::_HomePageState" o-- "encrypted_shared_preferences::encrypted_shared_preferences.dart::EncryptedSharedPreferences"
+"js_flutter::pages::HomePage.dart::_HomePageState" o-- "syncfusion_flutter_charts::src::chart::user_interaction::trackball.dart::TrackballBehavior"
+"js_flutter::pages::HomePage.dart::_HomePageState" o-- "dart::async::Stream<DocumentSnapshot<DailyStatsEntity>>"
+"js_flutter::pages::HomePage.dart::_HomePageState" o-- "dart::async::Stream<QuerySnapshot<BgReadingEntity>>"
+"js_flutter::pages::HomePage.dart::_HomePageState" o-- "dart::ui::AppLifecycleState"
+"js_flutter::pages::HomePage.dart::_HomePageState" o-- "flutter::src::widgets::framework.dart::GlobalKey<State<StatefulWidget>>"
+"flutter::src::widgets::framework.dart::State" <|-- "js_flutter::pages::HomePage.dart::_HomePageState"
+"flutter::src::widgets::binding.dart::WidgetsBindingObserver" <|-- "js_flutter::pages::HomePage.dart::_HomePageState"
+
+class "js_flutter::pages::LeaderboardPage.dart::LeaderboardPage" {
+  +_LeaderboardPageState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "js_flutter::pages::LeaderboardPage.dart::LeaderboardPage"
+
+class "js_flutter::pages::LeaderboardPage.dart::_LeaderboardPageState" {
+  +List<UserEntity> users
+  +List<UserEntity> friends
+  -GlobalKey<FormState> _formKey
+  +UserRepository userRepo
+  +TextEditingController nameController
+  +Timer? timer
+  +bool userRemoval
+  +User? currentUser
+  +List<Tab> tabs
+  +void initState()
+  +void dispose()
+  +void setUp()
+  +void sortUsers()
+  +void sortFriends()
+  +bool validateFriend()
+  +Widget buildFriendInput()
+  +List<ListTile> buildTabView()
+  +Widget build()
+}
+
+"js_flutter::pages::LeaderboardPage.dart::_LeaderboardPageState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"js_flutter::pages::LeaderboardPage.dart::_LeaderboardPageState" o-- "js_flutter::repository::UserRepository.dart::UserRepository"
+"js_flutter::pages::LeaderboardPage.dart::_LeaderboardPageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"js_flutter::pages::LeaderboardPage.dart::_LeaderboardPageState" o-- "dart::async::Timer"
+"js_flutter::pages::LeaderboardPage.dart::_LeaderboardPageState" o-- "firebase_auth::firebase_auth.dart::User"
+"flutter::src::widgets::framework.dart::State" <|-- "js_flutter::pages::LeaderboardPage.dart::_LeaderboardPageState"
+
+class "js_flutter::pages::MainPage.dart::HomePageController" {
+  +void Function()? cleanUp
+  +void Function()? setUp
+  +void Function()? addPoints
+  +void Function()? setPrefs
+}
+
+"js_flutter::pages::MainPage.dart::HomePageController" o-- "null::void Function()"
+
+class "js_flutter::pages::MainPage.dart::MainPage" {
+  +String title
+  +Function startCallback
+  +FirebaseAnalytics analytics
+  +FirebaseAnalyticsObserver observer
+  +State<MainPage> createState()
+}
+
+"js_flutter::pages::MainPage.dart::MainPage" o-- "firebase_analytics::firebase_analytics.dart::FirebaseAnalytics"
+"js_flutter::pages::MainPage.dart::MainPage" o-- "firebase_analytics::observer.dart::FirebaseAnalyticsObserver"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "js_flutter::pages::MainPage.dart::MainPage"
+
+class "js_flutter::pages::MainPage.dart::_MainPageState" {
+  +int currentIndex
+  +String? displayName
+  +HomePageController myController
+  +Map<int, String> pageNames
+  +PageController pageController
+  +void initState()
+  +void onItemTap()
+  +void pageChanged()
+  +List<BottomNavigationBarItem> buildBottomNavBarItems()
+  +Widget buildPageView()
+  +void setUserID()
+  +Widget build()
+}
+
+"js_flutter::pages::MainPage.dart::_MainPageState" o-- "js_flutter::pages::MainPage.dart::HomePageController"
+"js_flutter::pages::MainPage.dart::_MainPageState" o-- "flutter::src::widgets::page_view.dart::PageController"
+"flutter::src::widgets::framework.dart::State" <|-- "js_flutter::pages::MainPage.dart::_MainPageState"
+
+class "js_flutter::pages::SettingsPage.dart::SettingsPage" {
+  +HomePageController controller
+  +FirebaseAnalytics analytics
+  +State<SettingsPage> createState()
+}
+
+"js_flutter::pages::SettingsPage.dart::SettingsPage" o-- "js_flutter::pages::MainPage.dart::HomePageController"
+"js_flutter::pages::SettingsPage.dart::SettingsPage" o-- "firebase_analytics::firebase_analytics.dart::FirebaseAnalytics"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "js_flutter::pages::SettingsPage.dart::SettingsPage"
+
+class "js_flutter::pages::SettingsPage.dart::_SettingsPageState" {
+  +ApiController apiController
+  -GlobalKey<FormState> _formKey
+  -GlobalKey<FormState> _goalInput
+  +TextEditingController dailyGoalController
+  +TextEditingController idController
+  +TextEditingController pwdController
+  +EncryptedSharedPreferences encryptedSharedPreferences
+  +String? id
+  +String? pwd
+  +void initState()
+  +void setUp()
+  +Widget formBuilder()
+  +Widget dailyGoalInput()
+  +Widget build()
+}
+
+"js_flutter::pages::SettingsPage.dart::_SettingsPageState" o-- "js_flutter::services::apiController.dart::ApiController"
+"js_flutter::pages::SettingsPage.dart::_SettingsPageState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"js_flutter::pages::SettingsPage.dart::_SettingsPageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"js_flutter::pages::SettingsPage.dart::_SettingsPageState" o-- "encrypted_shared_preferences::encrypted_shared_preferences.dart::EncryptedSharedPreferences"
+"flutter::src::widgets::framework.dart::State" <|-- "js_flutter::pages::SettingsPage.dart::_SettingsPageState"
+
+class "js_flutter::pages::StatsPage.dart::StatsPage" {
+  +_StatsPageState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "js_flutter::pages::StatsPage.dart::StatsPage"
+
+class "js_flutter::pages::StatsPage.dart::_StatsPageState" {
+  +User? currentUser
+  +UserRepository userRepo
+  +PointsRepository pointsRepository
+  +DailyStatsRepository dailySatsRepo
+  +int points
+  +int level
+  +List<bool> timeFrames
+  +int selectedTimeFrame
+  +int touchedIndex
+  +int? showingTooltip
+  +int floatingPoint
+  +void initState()
+  -Widget _buildPieChart()
+  -List<PieChartSectionData> _createInRangeData()
+  -Widget _buildBarChart()
+  +BarChartGroupData generateGroupData()
+  -Widget _buildTopTile()
+  -Widget _buildToggleButtons()
+  -Widget _statsBuilder()
+  +Color pickColor()
+  +Widget build()
+}
+
+"js_flutter::pages::StatsPage.dart::_StatsPageState" o-- "firebase_auth::firebase_auth.dart::User"
+"js_flutter::pages::StatsPage.dart::_StatsPageState" o-- "js_flutter::repository::UserRepository.dart::UserRepository"
+"js_flutter::pages::StatsPage.dart::_StatsPageState" o-- "js_flutter::repository::PointsRepository.dart::PointsRepository"
+"js_flutter::pages::StatsPage.dart::_StatsPageState" o-- "js_flutter::repository::DailyStatsRepository.dart::DailyStatsRepository"
+"flutter::src::widgets::framework.dart::State" <|-- "js_flutter::pages::StatsPage.dart::_StatsPageState"
+
+class "js_flutter::repository::BgReadingRepository.dart::BgReadingRepository" {
+  +FirebaseFirestore database
+  +User? user
+  +PointsRepository pointsRepository
+  +UserRepository userRepo
+  +DailyStatsRepository dailyRepo
+  +HomePageController? myController
+  +void getController()
+  +Future<BgReadingEntity> create()
+  +Future<bool> isNewReading()
+  +Future<BgReadingEntity?> getLastReading()
+  +Future<BgReadingEntity?> getSecondLastReading()
+  +Future<BgReadingEntity?> getFirstReading()
+  +Future<bool> delete()
+  +Future<BgReadingEntity?> retrieve()
+  +Future<List<BgReadingEntity>> retrieveAll()
+  +Future<void> update()
+}
+
+"js_flutter::repository::BgReadingRepository.dart::BgReadingRepository" o-- "cloud_firestore::cloud_firestore.dart::FirebaseFirestore"
+"js_flutter::repository::BgReadingRepository.dart::BgReadingRepository" o-- "firebase_auth::firebase_auth.dart::User"
+"js_flutter::repository::BgReadingRepository.dart::BgReadingRepository" o-- "js_flutter::repository::PointsRepository.dart::PointsRepository"
+"js_flutter::repository::BgReadingRepository.dart::BgReadingRepository" o-- "js_flutter::repository::UserRepository.dart::UserRepository"
+"js_flutter::repository::BgReadingRepository.dart::BgReadingRepository" o-- "js_flutter::repository::DailyStatsRepository.dart::DailyStatsRepository"
+"js_flutter::repository::BgReadingRepository.dart::BgReadingRepository" o-- "js_flutter::pages::MainPage.dart::HomePageController"
+
+class "js_flutter::repository::DailyStatsRepository.dart::DailyStatsRepository" {
+  +FirebaseFirestore database
+  +User? user
+  +PointsRepository pointsRepository
+  +UserRepository userRepo
+  +Future<DailyStatsEntity?> getMyDailyStats()
+  +Future<List<DailyStatsEntity>?> getMyDailyStatsFor()
+  +Future<bool> setUpDailyStats()
+  +Future<void> updateDailyStats()
+  +Future<void> syncReadings()
+}
+
+"js_flutter::repository::DailyStatsRepository.dart::DailyStatsRepository" o-- "cloud_firestore::cloud_firestore.dart::FirebaseFirestore"
+"js_flutter::repository::DailyStatsRepository.dart::DailyStatsRepository" o-- "firebase_auth::firebase_auth.dart::User"
+"js_flutter::repository::DailyStatsRepository.dart::DailyStatsRepository" o-- "js_flutter::repository::PointsRepository.dart::PointsRepository"
+"js_flutter::repository::DailyStatsRepository.dart::DailyStatsRepository" o-- "js_flutter::repository::UserRepository.dart::UserRepository"
+
+class "js_flutter::repository::PointsRepository.dart::PointsRepository" {
+  +FirebaseFirestore database
+  +Future<int> getMyPoints()
+  +Future<void> updatePoints()
+}
+
+"js_flutter::repository::PointsRepository.dart::PointsRepository" o-- "cloud_firestore::cloud_firestore.dart::FirebaseFirestore"
+
+class "js_flutter::repository::UserRepository.dart::UserRepository" {
+  +FirebaseFirestore database
+  +Future<UserEntity> create()
+  +Future<bool> delete()
+  +Future<void> update()
+  +Future<UserEntity?> retrieve()
+  +Future<List<UserEntity>> retrieveAll()
+  +Future<bool> addFriend()
+  +Future<bool> checkUser()
+  +Future<List<UserEntity>> retrieveFriends()
+  +Future<bool> removeFriend()
+}
+
+"js_flutter::repository::UserRepository.dart::UserRepository" o-- "cloud_firestore::cloud_firestore.dart::FirebaseFirestore"
+
+class "js_flutter::services::apiController.dart::ApiController" {
+  +Client client
+  +EncryptedSharedPreferences encryptedSharedPreferences
+  +Map<String, String> headers
+  +Future<bool> validateDexcomCredentials()
+  +Future<String> setSessionID()
+  +Future<BgReading?> getBG()
+  +Future<List<BgReading>?> getXLastBGs()
+  +Future<String?> getDaysBG()
+  +Future<List<BgReading>?> getDataSource()
+}
+
+"js_flutter::services::apiController.dart::ApiController" o-- "http::src::client.dart::Client"
+"js_flutter::services::apiController.dart::ApiController" o-- "encrypted_shared_preferences::encrypted_shared_preferences.dart::EncryptedSharedPreferences"
+
+class "js_flutter::services::DBConnector.dart::DBConnector" {
+  +FirebaseFirestore db
+  +User? user
+  +FirebaseFirestore init()
+}
+
+"js_flutter::services::DBConnector.dart::DBConnector" o-- "cloud_firestore::cloud_firestore.dart::FirebaseFirestore"
+"js_flutter::services::DBConnector.dart::DBConnector" o-- "firebase_auth::firebase_auth.dart::User"
+
+class "js_flutter::services::ForegroundService.dart::MyTaskHandler" {
+  +EncryptedSharedPreferences encryptedSharedPreferences
+  +FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin
+  -SendPort? _sendPort
+  -int _eventCount
+  -BgReadingRepository? _bgRepo
+  -ApiController? _apiController
+  +String? id
+  +String? pwd
+  +DateTime? lastReadingTime
+  +Future<void> onStart()
+  +Future<void> onEvent()
+  +Future<void> onDestroy()
+  +void onButtonPressed()
+  +void onNotificationPressed()
+}
+
+"js_flutter::services::ForegroundService.dart::MyTaskHandler" o-- "encrypted_shared_preferences::encrypted_shared_preferences.dart::EncryptedSharedPreferences"
+"js_flutter::services::ForegroundService.dart::MyTaskHandler" o-- "flutter_local_notifications::src::flutter_local_notifications_plugin.dart::FlutterLocalNotificationsPlugin"
+"js_flutter::services::ForegroundService.dart::MyTaskHandler" o-- "dart::isolate::SendPort"
+"js_flutter::services::ForegroundService.dart::MyTaskHandler" o-- "js_flutter::repository::BgReadingRepository.dart::BgReadingRepository"
+"js_flutter::services::ForegroundService.dart::MyTaskHandler" o-- "js_flutter::services::apiController.dart::ApiController"
+"flutter_foreground_task::flutter_foreground_task.dart::TaskHandler" <|-- "js_flutter::services::ForegroundService.dart::MyTaskHandler"
+
+class "js_flutter::services::ForegroundService.dart::ForegroundService" {
+  {static} -ReceivePort? _receivePort
+  +void initForegroundTask()
+  +Future<bool> startForegroundTask()
+  +Future<bool> stopForegroundTask()
+  +bool registerReceivePort()
+  +void closeReceivePort()
+}
+
+"js_flutter::services::ForegroundService.dart::ForegroundService" o-- "dart::isolate::ReceivePort"
+
+class "js_flutter::services::NotificationService.dart::NotificationService" {
+  +FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin
+  {static} +NotificationAppLaunchDetails? notificationAppLaunchDetails
+  {static} +Future<void> init()
+  {static} +Future<dynamic> showNotification()
+  +void cancelNotification()
+  +void cancelAllNotifications()
+}
+
+"js_flutter::services::NotificationService.dart::NotificationService" o-- "flutter_local_notifications::src::flutter_local_notifications_plugin.dart::FlutterLocalNotificationsPlugin"
+"js_flutter::services::NotificationService.dart::NotificationService" o-- "flutter_local_notifications_platform_interface::src::types.dart::NotificationAppLaunchDetails"
+
+class "js_flutter::utils::aplicationstate.dart::ApplicationState" {
+  -ApplicationLoginState _loginState
+  -String? _email
+  +ApplicationLoginState loginState
+  +String? email
+  +Future<void> init()
+  +void startLoginFlow()
+  +Future<void> verifyEmail()
+  +Future<void> signInWithEmailAndPassword()
+  +void cancelRegistration()
+  +Future<void> registerAccount()
+  +void signOut()
+}
+
+"js_flutter::utils::aplicationstate.dart::ApplicationState" o-- "js_flutter::utils::authentication.dart::ApplicationLoginState"
+"flutter::src::foundation::change_notifier.dart::ChangeNotifier" <|-- "js_flutter::utils::aplicationstate.dart::ApplicationState"
+
+class "js_flutter::utils::authentication.dart::Authentication" {
+  +ApplicationLoginState loginState
+  +String? email
+  +void Function() startLoginFlow
+  +void Function(String, void Function(Exception)) verifyEmail
+  +void Function(String, String, void Function(Exception)) signInWithEmailAndPassword
+  +void Function() cancelRegistration
+  +void Function(String, String, String, void Function(Exception)) registerAccount
+  +void Function() signOut
+  {static} +Map<String, String> errorMessages
+  +Widget build()
+  -void _showErrorDialog()
+}
+
+"js_flutter::utils::authentication.dart::Authentication" o-- "js_flutter::utils::authentication.dart::ApplicationLoginState"
+"js_flutter::utils::authentication.dart::Authentication" o-- "null::void Function()"
+"js_flutter::utils::authentication.dart::Authentication" o-- "null::void Function(String, void Function(Exception))"
+"js_flutter::utils::authentication.dart::Authentication" o-- "null::void Function(String, String, void Function(Exception))"
+"js_flutter::utils::authentication.dart::Authentication" o-- "null::void Function(String, String, String, void Function(Exception))"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "js_flutter::utils::authentication.dart::Authentication"
+
+class "js_flutter::utils::authentication.dart::EmailForm" {
+  +void Function(String) callback
+  +_EmailFormState createState()
+}
+
+"js_flutter::utils::authentication.dart::EmailForm" o-- "null::void Function(String)"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "js_flutter::utils::authentication.dart::EmailForm"
+
+class "js_flutter::utils::authentication.dart::_EmailFormState" {
+  -GlobalKey<FormState> _formKey
+  -TextEditingController _controller
+  +Widget build()
+}
+
+"js_flutter::utils::authentication.dart::_EmailFormState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"js_flutter::utils::authentication.dart::_EmailFormState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "js_flutter::utils::authentication.dart::_EmailFormState"
+
+class "js_flutter::utils::authentication.dart::RegisterForm" {
+  +String email
+  +void Function(String, String, String) registerAccount
+  +void Function() cancel
+  +_RegisterFormState createState()
+}
+
+"js_flutter::utils::authentication.dart::RegisterForm" o-- "null::void Function(String, String, String)"
+"js_flutter::utils::authentication.dart::RegisterForm" o-- "null::void Function()"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "js_flutter::utils::authentication.dart::RegisterForm"
+
+class "js_flutter::utils::authentication.dart::_RegisterFormState" {
+  -GlobalKey<FormState> _formKey
+  -TextEditingController _emailController
+  -TextEditingController _displayNameController
+  -TextEditingController _passwordController
+  +FocusNode myFocusNode
+  +void initState()
+  +Future<bool> validateDisplayName()
+  +Widget build()
+}
+
+"js_flutter::utils::authentication.dart::_RegisterFormState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"js_flutter::utils::authentication.dart::_RegisterFormState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"js_flutter::utils::authentication.dart::_RegisterFormState" o-- "flutter::src::widgets::focus_manager.dart::FocusNode"
+"flutter::src::widgets::framework.dart::State" <|-- "js_flutter::utils::authentication.dart::_RegisterFormState"
+
+class "js_flutter::utils::authentication.dart::PasswordForm" {
+  +String email
+  +void Function(String, String) login
+  +_PasswordFormState createState()
+}
+
+"js_flutter::utils::authentication.dart::PasswordForm" o-- "null::void Function(String, String)"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "js_flutter::utils::authentication.dart::PasswordForm"
+
+class "js_flutter::utils::authentication.dart::_PasswordFormState" {
+  -GlobalKey<FormState> _formKey
+  -TextEditingController _emailController
+  -TextEditingController _passwordController
+  +void initState()
+  +Widget build()
+}
+
+"js_flutter::utils::authentication.dart::_PasswordFormState" o-- "flutter::src::widgets::framework.dart::GlobalKey<FormState>"
+"js_flutter::utils::authentication.dart::_PasswordFormState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "js_flutter::utils::authentication.dart::_PasswordFormState"
+
+class "js_flutter::utils::authentication.dart::ApplicationLoginState" {
+  +int index
+  {static} +List<ApplicationLoginState> values
+  {static} +ApplicationLoginState loggedOut
+  {static} +ApplicationLoginState emailAddress
+  {static} +ApplicationLoginState register
+  {static} +ApplicationLoginState password
+  {static} +ApplicationLoginState loggedIn
+}
+
+"js_flutter::utils::authentication.dart::ApplicationLoginState" o-- "js_flutter::utils::authentication.dart::ApplicationLoginState"
+"dart::core::Enum" <|-- "js_flutter::utils::authentication.dart::ApplicationLoginState"
+
+class "js_flutter::utils::strings.dart::Strings" {
+  {static} +String DEXCOM_BASE_URL
+  {static} +String DEXCOM_BASE_URL_OUS
+  {static} +String DEXCOM_LOGIN_ID_ENDPOINT
+  {static} +String DEXCOM_AUTHENTICATE_ENDPOINT
+  {static} +String DEXCOM_VERIFY_SERIAL_NUMBER_ENDPOINT
+  {static} +String DEXCOM_GLUCOSE_READINGS_ENDPOINT
+  {static} +String DEXCOM_APPLICATION_ID
+  {static} +String ACCOUNT_ERROR_USERNAME_NULL_EMPTY
+  {static} +String ACCOUNT_ERROR_PASSWORD_NULL_EMPTY
+  {static} +String SESSION_ERROR_ACCOUNT_ID_NULL_EMPTY
+  {static} +String SESSION_ERROR_ACCOUNT_ID_DEFAULT
+  {static} +String ACCOUNT_ERROR_ACCOUNT_NOT_FOUND
+  {static} +String ACCOUNT_ERROR_PASSWORD_INVALID
+  {static} +String ACCOUNT_ERROR_MAX_ATTEMPTS
+  {static} +String ACCOUNT_ERROR_UNKNOWN
+  {static} +String SESSION_ERROR_SESSION_ID_NULL
+  {static} +String SESSION_ERROR_SESSION_ID_DEFAULT
+  {static} +String SESSION_ERROR_SESSION_NOT_VALID
+  {static} +String SESSION_ERROR_SESSION_NOT_FOUND
+  {static} +String ARGUEMENT_ERROR_MINUTES_INVALID
+  {static} +String ARGUEMENT_ERROR_MAX_COUNT_INVALID
+  {static} +String ARGUEMENT_ERROR_SERIAL_NUMBER_NULL_EMPTY
+  {static} +List<String> DEXCOM_TREND_DESCRIPTIONS
+  {static} +Map<String, int> DEXCOM_TREND_DIRECTIONS
+  {static} +List<String> DEXCOM_TREND_ARROWS
+}
+
+class "js_flutter::utils::widgets.dart::Header" {
+  +String heading
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "js_flutter::utils::widgets.dart::Header"
+
+class "js_flutter::utils::widgets.dart::Paragraph" {
+  +String content
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "js_flutter::utils::widgets.dart::Paragraph"
+
+class "js_flutter::utils::widgets.dart::IconAndDetail" {
+  +IconData icon
+  +String detail
+  +Widget build()
+}
+
+"js_flutter::utils::widgets.dart::IconAndDetail" o-- "flutter::src::widgets::icon_data.dart::IconData"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "js_flutter::utils::widgets.dart::IconAndDetail"
+
+class "js_flutter::utils::widgets.dart::StyledButton" {
+  +Widget child
+  +void Function() onPressed
+  +Widget build()
+}
+
+"js_flutter::utils::widgets.dart::StyledButton" o-- "flutter::src::widgets::framework.dart::Widget"
+"js_flutter::utils::widgets.dart::StyledButton" o-- "null::void Function()"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "js_flutter::utils::widgets.dart::StyledButton"
+
+
+@enduml
