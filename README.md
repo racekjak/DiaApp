@@ -2,9 +2,11 @@
 
 Gamified mobile application for diabetes patients using Dexcom CGM
 This application was created as part of a theses: https://vskp.vse.cz/89417
-<img src="https://github.com/racj01/flutter-dexcom/assets/57296104/3e77d96d-01dc-4578-b532-6bb0df879744" alt= “obrazovka-stats” width="200">
 
-<img src="https://github.com/racj01/flutter-dexcom/assets/57296104/6e727a77-0e6e-4ce7-9da9-0391b33e05a9" alt= “obrazovka-graf” width="200">
 
-<img src="https://github.com/racj01/flutter-dexcom/assets/57296104/db6f76b9-1218-43cd-a011-0929f89c47b7" alt= “obrazovka-ladder” width="200">
 
+<img src="https://github.com/racj01/DiaApp/assets/57296104/2a2cf946-70aa-4bee-8bd4-54ac984c478f" width="300" height="600" />
+
+<img src="https://github.com/racj01/DiaApp/assets/57296104/0cba2db8-19cf-4043-8814-72fd83455327" width="300" height="600" />
+
+<img src="https://github.com/racj01/DiaApp/assets/57296104/3cc3107a-c52d-4e62-bcad-f8b919aab0d9" width="300" height="600" />
