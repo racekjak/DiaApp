@@ -1,6 +1,7 @@
 # DiaApp
 
-Gamified mobile application for diabetes patients using Dexcom CGM
+Gamified mobile application for diabetes patients using Dexcom CGM.
+
 This application was created as part of a theses: https://vskp.vse.cz/89417
 
 
