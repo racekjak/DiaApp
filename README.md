@@ -1,7 +1,7 @@
 # DiaApp
 
 Gamified mobile application for diabetes patients using Dexcom CGM
-
+This application was created as part of a theses: https://vskp.vse.cz/89417
 <img src="https://github.com/racj01/flutter-dexcom/assets/57296104/3e77d96d-01dc-4578-b532-6bb0df879744" alt= “obrazovka-stats” width="200">
 
 <img src="https://github.com/racj01/flutter-dexcom/assets/57296104/6e727a77-0e6e-4ce7-9da9-0391b33e05a9" alt= “obrazovka-graf” width="200">
